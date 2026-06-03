@@ -5,7 +5,10 @@ name: 📊 Atualizar Dashboard Diariamente
 on:
   schedule:
     - cron: '0 12 * * *'  # 12h UTC = 9h Brasília (UTC-3) / 8h (UTC-2 verão)
-  
+
+permissions:
+  contents: write
+
   # Permite rodar manualmente
   workflow_dispatch:
 
