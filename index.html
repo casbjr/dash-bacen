@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Oficial - Macro Brasil | PortoBank</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0a3d62;
+            --primary-light: #1a5f8f;
+            --accent: #d4a574;
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --dark: #1a1f36;
+            --darker: #0f1419;
+            --text-primary: #f8f9fa;
+            --text-secondary: #cbd5e1;
+            --border: #334155;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, #0d2e47 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header-content h1 {
+            font-size: 2.2rem;
+            font-weight: 300;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-content h1 strong {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .header-content p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .header-meta {
+            text-align: right;
+        }
+
+        .last-update {
+            color: var(--text-secondary);
+            margin-bottom: 0.7rem;
+            font-size: 0.9rem;
+        }
+
+        .data-source {
+            color: var(--accent);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .refresh-btn {
+            background: var(--primary-light);
+            color: white;
+            border: 1px solid var(--accent);
+            padding: 0.7rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: var(--accent);
+            color: var(--dark);
+            box-shadow: 0 8px 24px rgba(212, 165, 116, 0.15);
+        }
+
+        /* Sections */
+        section {
+            margin-bottom: 3.5rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.5px;
+        }
+
+        .section-title strong {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Card */
+        .card {
+            background: rgba(26, 31, 54, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 12px 48px rgba(212, 165, 116, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        /* Indicator */
+        .indicator-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-secondary);
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .indicator-value {
+            font-size: 2.2rem;
+            font-weight: 300;
+            letter-spacing: -1px;
+            margin-bottom: 0.3rem;
+            color: var(--text-primary);
+        }
+
+        .indicator-value .unit {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-left: 0.2rem;
+        }
+
+        .indicator-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.8rem;
+        }
+
+        .trend {
+            font-weight: 600;
+        }
+
+        .trend-up {
+            color: var(--success);
+        }
+
+        .trend-down {
+            color: var(--danger);
+        }
+
+        .source {
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Comunicados */
+        .comunicado {
+            background: rgba(26, 31, 54, 0.6);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 4px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .comunicado:hover {
+            border-color: var(--accent);
+            box-shadow: 0 8px 24px rgba(212, 165, 116, 0.08);
+        }
+
+        .comunicado-date {
+            font-size: 0.75rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .comunicado-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .comunicado-link {
+            display: inline-block;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.8rem;
+            margin-top: 0.7rem;
+            border-bottom: 1px solid var(--accent);
+            transition: color 0.3s ease;
+        }
+
+        .comunicado-link:hover {
+            color: var(--text-primary);
+        }
+
+        /* Info Box */
+        .info-box {
+            background: linear-gradient(135deg, rgba(10, 61, 98, 0.2) 0%, rgba(212, 165, 116, 0.1) 100%);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-box p {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--dark);
+            padding: 0.3rem 0.7rem;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 3rem;
+        }
+
+        footer p {
+            margin-bottom: 0.3rem;
+        }
+
+        .loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .header-meta {
+                text-align: left;
+            }
+
+            .header-content h1 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-content">
+                <h1>Cenário <strong>Macroeconômico</strong></h1>
+                <p>Dashboard Oficial - Banco Central & IBGE</p>
+            </div>
+            <div class="header-meta">
+                <div class="last-update">Última atualização: <span id="lastUpdate">--:--</span></div>
+                <div class="data-source">🤖 Automática Diária</div>
+                <button class="refresh-btn" onclick="refreshData()">↻ Atualizar</button>
+            </div>
+        </header>
+
+        <!-- Info Banner -->
+        <div class="info-box">
+            <p><strong>✅ 100% Dados Oficiais:</strong> Todos os indicadores são obtidos diretamente do Banco Central do Brasil e IBGE</p>
+            <p><strong>🔄 Atualização Automática:</strong> Executa todos os dias às 9h via GitHub Actions</p>
+            <span class="badge">Oficial BC/IBGE</span>
+        </div>
+
+        <!-- SEÇÃO 1: INDICADORES MACROECONÔMICOS -->
+        <section>
+            <h2 class="section-title">Indicadores <strong>Macroeconômicos</strong></h2>
+            <p class="section-subtitle">Banco Central do Brasil</p>
+
+            <div class="grid">
+                <div class="card">
+                    <div class="indicator-label">Taxa Selic</div>
+                    <div class="indicator-value"><span id="selic">--</span><span class="unit">%</span></div>
+                    <div class="indicator-meta">
+                        <span class="trend" id="selicTrend"></span>
+                        <span class="source" id="selicDate">--</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="indicator-label">IPCA (12 meses)</div>
+                    <div class="indicator-value"><span id="ipca">--</span><span class="unit">%</span></div>
+                    <div class="indicator-meta">
+                        <span class="trend" id="ipcaTrend"></span>
+                        <span class="source" id="ipcaDate">--</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="indicator-label">Dólar (USD/BRL)</div>
+                    <div class="indicator-value"><span id="dolar">--</span><span class="unit">R$</span></div>
+                    <div class="indicator-meta">
+                        <span class="trend" id="dolarTrend"></span>
+                        <span class="source" id="dolarDate">--</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="indicator-label">Poupança</div>
+                    <div class="indicator-value"><span id="poupanca">--</span><span class="unit">%</span></div>
+                    <div class="indicator-meta">
+                        <span class="trend" id="poupancaTrend"></span>
+                        <span class="source" id="poupancaDate">--</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="indicator-label">Expectativa Selic (Focus)</div>
+                    <div class="indicator-value"><span id="focus">--</span><span class="unit">%</span></div>
+                    <div class="indicator-meta">
+                        <span class="trend" id="focusTrend"></span>
+                        <span class="source" id="focusDate">--</span>
+                    </div>
+                </div>
+
+                <div class="card" style="border-left: 4px solid var(--accent);">
+                    <div class="indicator-label">📊 Spread (Focus - Selic)</div>
+                    <div class="indicator-value"><span id="spread">--</span><span class="unit">bps</span></div>
+                    <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.85rem; color: var(--text-secondary);">
+                        <span id="spreadInterpretation">--</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 2: INDICADORES IBGE -->
+        <section>
+            <h2 class="section-title">Indicadores <strong>Econômicos</strong></h2>
+            <p class="section-subtitle">Instituto Brasileiro de Geografia e Estatística</p>
+
+            <div class="grid">
+                <div class="card">
+                    <div class="indicator-label">Taxa de Desemprego</div>
+                    <div class="indicator-value"><span id="desemprego">--</span><span class="unit">%</span></div>
+                    <div class="indicator-meta">
+                        <span class="trend" id="desempregoTrend"></span>
+                        <span class="source" id="desempregoDate">--</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="indicator-label">PIB (Crescimento)</div>
+                    <div class="indicator-value"><span id="pib">--</span><span class="unit">%</span></div>
+                    <div class="indicator-meta">
+                        <span class="trend" id="pibTrend"></span>
+                        <span class="source" id="pibDate">--</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="indicator-label">Confiança do Consumidor</div>
+                    <div class="indicator-value"><span id="confianca">--</span><span class="unit"></span></div>
+                    <div class="indicator-meta">
+                        <span class="trend" id="confiancaTrend"></span>
+                        <span class="source" id="confiancaDate">--</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 4: Status das APIs -->
+        <section>
+            <h2 class="section-title">Status das <strong>Integrações</strong></h2>
+            <p class="section-subtitle">Verificação de Conectividade com APIs Oficiais</p>
+
+            <div class="info-box">
+                <p><strong id="apiSuccessRate">9/9</strong> APIs respondendo normalmente</p>
+                <div id="apiStatusDetails" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.8rem; font-size: 0.85rem;">
+                    <!-- Preenchido via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 5: Comunicados BC -->
+        <section>
+            <h2 class="section-title">Comunicados & <strong>Normativas</strong></h2>
+            <p class="section-subtitle">Banco Central do Brasil</p>
+            <div id="comunicadosList"></div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>© 2024 PortoBank - Dashboard Oficial</p>
+            <p>Dados: Banco Central do Brasil | IBGE | Atualização Automática Diária</p>
+        </footer>
+    </div>
+
+    <script>
+        const CONFIG = {
+            dataUrl: 'data_official.json',
+            cacheDuration: 3600000,
+        };
+
+        async function loadData() {
+            const cached = localStorage.getItem('dashboardDataOfficial');
+            const cachedTime = localStorage.getItem('dashboardTimeOfficial');
+
+            if (cached && cachedTime && (Date.now() - parseInt(cachedTime) < CONFIG.cacheDuration)) {
+                return JSON.parse(cached);
+            }
+
+            try {
+                const response = await fetch(CONFIG.dataUrl, { cache: 'no-cache' });
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('dashboardDataOfficial', JSON.stringify(data));
+                    localStorage.setItem('dashboardTimeOfficial', Date.now().toString());
+                    return data;
+                }
+            } catch (e) {
+                console.warn('Erro ao buscar dados:', e);
+            }
+
+            return JSON.parse(localStorage.getItem('dashboardDataOfficial') || '{}');
+        }
+
+        function formatNumber(num, decimals = 2) {
+            if (num === null || num === undefined || num === '--') return '--';
+            return parseFloat(num).toLocaleString('pt-BR', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            });
+        }
+
+        function formatTrend(value) {
+            if (!value && value !== 0) return '';
+            const sign = value >= 0 ? '▲' : '▼';
+            const className = value >= 0 ? 'trend-up' : 'trend-down';
+            return `<span class="${className}">${sign} ${Math.abs(value).toFixed(2)}%</span>`;
+        }
+
+        function renderIndicators(data) {
+            const macro = data.macro || {};
+
+            // BC indicators
+            Object.keys(macro).forEach(key => {
+                const ind = macro[key];
+                if (!ind.value && ind.value !== 0) return;
+
+                const el = document.getElementById(key);
+                if (el) {
+                    el.textContent = formatNumber(ind.value);
+                    const trendEl = document.getElementById(key + 'Trend');
+                    if (trendEl) trendEl.innerHTML = formatTrend(ind.trend);
+                    const dateEl = document.getElementById(key + 'Date');
+                    if (dateEl) dateEl.textContent = ind.date;
+                }
+
+                // Renderizar interpretação do Spread
+                if (key === 'spread' && document.getElementById('spreadInterpretation')) {
+                    document.getElementById('spreadInterpretation').textContent = ind.interpretation || '--';
+                }
+            });
+        }
+
+        function renderApiStatus(data) {
+            const metadata = data.metadata || {};
+            const apiStatus = metadata.apiStatus || {};
+            const successRate = metadata.successRate || '0/9';
+
+            document.getElementById('apiSuccessRate').textContent = successRate;
+
+            const statusDetails = document.getElementById('apiStatusDetails');
+            if (statusDetails) {
+                const apiNames = {
+                    'bc_selic': '💵 Selic',
+                    'bc_ipca': '📊 IPCA',
+                    'bc_cambio': '💱 Dólar',
+                    'bc_poupanca': '🏦 Poupança',
+                    'bc_focus': '📈 Focus',
+                    'ibge_desemprego': '👥 Desemprego',
+                    'ibge_pib': '🎯 PIB',
+                    'ibge_confianca': '😊 Confiança',
+                    'bc_comunicados': '📰 Comunicados'
+                };
+
+                statusDetails.innerHTML = Object.keys(apiStatus).map(key => {
+                    const status = apiStatus[key];
+                    const name = apiNames[key] || key;
+                    const icon = status === 'success' ? '✅' : '❌';
+                    const color = status === 'success' ? 'var(--success)' : 'var(--danger)';
+                    
+                    return `
+                        <div style="padding: 0.5rem; background: rgba(255,255,255,0.02); border-radius: 4px; border-left: 2px solid ${color};">
+                            ${icon} ${name}
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function renderComunicados(data) {
+            const list = document.getElementById('comunicadosList');
+            if (!data.comunicados || data.comunicados.length === 0) {
+                list.innerHTML = '<p style="color: var(--text-secondary);">Nenhum comunicado disponível</p>';
+                return;
+            }
+
+            list.innerHTML = data.comunicados.map(c => `
+                <div class="comunicado">
+                    <div class="comunicado-date">${c.date}</div>
+                    <div class="comunicado-title">${c.title}</div>
+                    <a href="${c.link}" target="_blank" class="comunicado-link">Acesse no site do BC →</a>
+                </div>
+            `).join('');
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false });
+            document.getElementById('lastUpdate').textContent = time;
+        }
+
+        async function refreshData() {
+            const btn = document.querySelector('.refresh-btn');
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            try {
+                const data = await loadData();
+                renderIndicators(data);
+                renderComunicados(data);
+                renderApiStatus(data);
+                updateTime();
+            } catch (e) {
+                console.error('Erro:', e);
+                alert('Erro ao atualizar dados');
+            } finally {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await refreshData();
+            setInterval(refreshData, 30 * 60 * 1000);
+        });
+    </script>
+</body>
+</html>
