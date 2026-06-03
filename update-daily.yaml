@@ -1,0 +1,79 @@
+name: 📊 Atualizar Dashboard Diariamente
+
+# Executa todos os dias às 9h (horário UTC)
+# Para horário de São Paulo, subtraia 3h: 9h UTC = 6h BR (ou 5h em horário de verão)
+on:
+  schedule:
+    - cron: '0 12 * * *'  # 12h UTC = 9h Brasília (UTC-3) / 8h (UTC-2 verão)
+  
+  # Permite rodar manualmente
+  workflow_dispatch:
+
+jobs:
+  update-dashboard:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. Clonar o repositório
+      - name: 📥 Clonar Repositório
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      # 2. Configurar Python
+      - name: 🐍 Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      # 3. Instalar dependências
+      - name: 📦 Instalar Dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+      
+      # 4. Executar script de atualização
+      - name: 🔄 Atualizar Dados
+        run: |
+          echo "⏰ Iniciando atualização automática..."
+          python update_data.py
+          echo "✅ Atualização concluída!"
+      
+      # 5. Verificar se houve mudanças
+      - name: 🔍 Verificar Mudanças
+        id: verify-changes
+        run: |
+          if git diff --quiet; then
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "📝 Arquivo data.json foi modificado"
+          fi
+      
+      # 6. Configurar Git
+      - name: ⚙️ Configurar Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Actions Bot"
+      
+      # 7. Fazer commit e push
+      - name: 💾 Commit e Push das Mudanças
+        if: steps.verify-changes.outputs.changes == 'true'
+        run: |
+          git add data.json
+          git commit -m "🤖 Atualização automática - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          git push
+      
+      # 8. Mensagem de sucesso
+      - name: ✅ Sucesso!
+        run: |
+          echo "✨ Dashboard atualizado com sucesso!"
+          echo "🔗 Acesse: https://github.com/${{ github.repository }}"
+          echo "⏰ Data/Hora: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+      
+      # 9. (Opcional) Notificar em caso de erro
+      - name: ❌ Erro na Atualização
+        if: failure()
+        run: |
+          echo "⚠️ Houve um erro na atualização automática"
+          echo "Verifique os logs do GitHub Actions"
