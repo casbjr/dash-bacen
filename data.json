@@ -1,76 +1,72 @@
 {
   "metadata": {
-    "lastUpdate": "2026-06-03 01:08:37",
-    "status": "success",
-    "itemsUpdated": 2,
-    "dataType": "100% OFICIAL (BC/IBGE)",
-    "successRate": "1/9",
+    "lastUpdate": "2026-06-03 01:31:29",
+    "successRate": "1/8",
     "apiStatus": {
-      "bc_selic": "failed",
-      "bc_ipca": "failed",
-      "bc_cambio": "failed",
-      "bc_poupanca": "failed",
-      "bc_focus": "failed",
-      "ibge_desemprego": "failed",
-      "ibge_pib": "failed",
-      "ibge_confianca": "failed",
-      "bc_comunicados": "success"
+      "selic": false,
+      "ipca": true,
+      "poupanca": false,
+      "dolar": false,
+      "focus": false,
+      "desemprego": false,
+      "pib": false,
+      "confianca": false
     }
   },
   "macro": {
     "selic": {
       "value": 10.5,
-      "trend": -0.25,
-      "date": "2024-06-02",
-      "source": "Banco Central do Brasil"
+      "trend": 0.0,
+      "source": "Banco Central",
+      "updatedAt": "2026-06-03 01:31:29"
     },
     "ipca": {
-      "value": 4.23,
-      "trend": -0.18,
-      "date": "2024-06-02",
-      "source": "Banco Central do Brasil"
+      "value": 4.39,
+      "trend": 3.78,
+      "source": "Banco Central",
+      "updatedAt": "2026-06-03 01:31:29"
     },
     "dolar": {
       "value": 4.98,
-      "trend": 0.52,
-      "date": "2024-06-02",
-      "source": "Banco Central do Brasil"
+      "trend": 0.0,
+      "source": "Banco Central",
+      "updatedAt": "2026-06-03 01:31:29"
     },
     "poupanca": {
       "value": 0.55,
       "trend": 0.0,
-      "date": "2024-06-02",
-      "source": "Banco Central do Brasil"
+      "source": "Banco Central",
+      "updatedAt": "2026-06-03 01:31:29"
     },
     "focus": {
       "value": 10.25,
-      "trend": -0.25,
-      "date": "2024-06-02",
-      "source": "Expectativa de Mercado (BC)"
+      "trend": 0.0,
+      "source": "Banco Central",
+      "updatedAt": "2026-06-03 01:31:29"
     },
     "spread": {
       "value": -0.25,
+      "bps": -25,
       "interpretation": "Mercado espera QUEDA",
-      "date": "2026-06-03",
-      "source": "Cálculo BC Focus vs Selic"
+      "updatedAt": "2026-06-03 01:31:29"
     },
     "desemprego": {
       "value": 7.8,
-      "trend": -0.1,
-      "date": "2024-06-02",
-      "source": "IBGE - PNAD Contínua"
+      "trend": 0.0,
+      "source": "IBGE",
+      "updatedAt": "2026-06-03 01:31:29"
     },
     "pib": {
       "value": 2.1,
       "trend": 0.0,
-      "date": "2024-Q1",
-      "source": "IBGE"
+      "source": "IBGE",
+      "updatedAt": "2026-06-03 01:31:29"
     },
     "confianca": {
       "value": 89.5,
-      "trend": 2.3,
-      "date": "2024-06-02",
-      "source": "IBGE - Índice de Confiança"
+      "trend": 0.0,
+      "source": "FGV",
+      "updatedAt": "2026-06-03 01:31:29"
     }
   },
   "comunicados": [
