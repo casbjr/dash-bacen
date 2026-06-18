@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "lastUpdate": "2026-06-17 14:50:36",
+    "lastUpdate": "2026-06-18 14:46:43",
     "successRate": "1/8",
     "apiStatus": {
       "selic": false,
@@ -18,55 +18,55 @@
       "value": 10.5,
       "trend": 0.0,
       "source": "Banco Central",
-      "updatedAt": "2026-06-17 14:50:36"
+      "updatedAt": "2026-06-18 14:46:43"
     },
     "ipca": {
       "value": 4.72,
       "trend": 0.0,
       "source": "Banco Central",
-      "updatedAt": "2026-06-17 14:50:36"
+      "updatedAt": "2026-06-18 14:46:43"
     },
     "dolar": {
       "value": 4.98,
       "trend": 0.0,
       "source": "Banco Central",
-      "updatedAt": "2026-06-17 14:50:36"
+      "updatedAt": "2026-06-18 14:46:43"
     },
     "poupanca": {
       "value": 0.55,
       "trend": 0.0,
       "source": "Banco Central",
-      "updatedAt": "2026-06-17 14:50:36"
+      "updatedAt": "2026-06-18 14:46:43"
     },
     "focus": {
       "value": 10.25,
       "trend": 0.0,
       "source": "Banco Central",
-      "updatedAt": "2026-06-17 14:50:36"
+      "updatedAt": "2026-06-18 14:46:43"
     },
     "spread": {
       "value": -0.25,
       "bps": -25,
       "interpretation": "Mercado espera QUEDA",
-      "updatedAt": "2026-06-17 14:50:36"
+      "updatedAt": "2026-06-18 14:46:43"
     },
     "desemprego": {
       "value": 7.8,
       "trend": 0.0,
       "source": "IBGE",
-      "updatedAt": "2026-06-17 14:50:36"
+      "updatedAt": "2026-06-18 14:46:43"
     },
     "pib": {
       "value": 2.1,
       "trend": 0.0,
       "source": "IBGE",
-      "updatedAt": "2026-06-17 14:50:36"
+      "updatedAt": "2026-06-18 14:46:43"
     },
     "confianca": {
       "value": 89.5,
       "trend": 0.0,
       "source": "FGV",
-      "updatedAt": "2026-06-17 14:50:36"
+      "updatedAt": "2026-06-18 14:46:43"
     }
   },
   "comunicados": [
