@@ -3,58 +3,58 @@
     "selic": {
       "value": 14.25,
       "unit": "% a.a.",
-      "trend": -3.39,
+      "trend": 0.0,
       "source": "Banco Central",
-      "updatedAt": "2026-06-23 01:03:20"
+      "updatedAt": "2026-06-23 01:29:22"
     },
     "ipca": {
       "value": 4.72,
       "unit": "% 12m",
-      "trend": 14.01,
+      "trend": 0.0,
       "source": "Banco Central",
-      "updatedAt": "2026-06-23 01:03:20"
+      "updatedAt": "2026-06-23 01:29:22"
     },
     "poupanca": {
       "value": 0.6707,
       "unit": "% a.m.",
-      "trend": -6.85,
+      "trend": 0.0,
       "source": "Banco Central",
-      "updatedAt": "2026-06-23 01:03:20"
+      "updatedAt": "2026-06-23 01:29:22"
     },
     "dolar": {
       "value": 5.1395,
       "unit": "R$/USD",
-      "trend": -2.1,
+      "trend": 0.0,
       "source": "Banco Central",
-      "updatedAt": "2026-06-23 01:03:20"
+      "updatedAt": "2026-06-23 01:29:22"
     },
     "focus": {
       "value": 4.86,
       "unit": "% IPCA proj.",
       "trend": 0.0,
       "source": "Banco Central",
-      "updatedAt": "2026-06-23 01:03:20"
+      "updatedAt": "2026-06-23 01:29:22"
     },
     "desemprego": {
       "value": 5.8,
       "unit": "%",
-      "trend": 3.57,
+      "trend": 0.0,
       "source": "IBGE",
-      "updatedAt": "2026-06-23 01:03:20"
+      "updatedAt": "2026-06-23 01:29:22"
     },
     "pib": {
       "value": 2.3,
       "unit": "% acum. 4tri",
       "trend": 0.0,
       "source": "IBGE",
-      "updatedAt": "2026-06-23 01:03:20"
+      "updatedAt": "2026-06-23 01:29:22"
     },
     "confianca": {
       "value": 101.5,
       "unit": "pontos",
       "trend": 0.0,
       "source": "FGV/IBGE",
-      "updatedAt": "2026-06-23 01:03:20"
+      "updatedAt": "2026-06-23 01:29:22"
     },
     "spread": {
       "value": -9.39,
@@ -62,11 +62,11 @@
       "interpretation": "Mercado espera QUEDA de juros",
       "unit": "pp",
       "source": "Calculado (Focus IPCA - Selic)",
-      "updatedAt": "2026-06-23 01:03:20"
+      "updatedAt": "2026-06-23 01:29:22"
     }
   },
   "metadata": {
-    "lastUpdate": "2026-06-23 01:03:20",
+    "lastUpdate": "2026-06-23 01:29:22",
     "successRate": "5/8",
     "apiStatus": {
       "selic": true,
