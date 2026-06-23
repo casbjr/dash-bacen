@@ -69,7 +69,7 @@ def load_data():
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     except:
-        return {"macro": {}, "metadata": {}, "comunicados": []}
+        return {"macro": {}, "metadata": {}, "comunicados": [], "history": {}}
 
 def save_data(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
@@ -88,6 +88,27 @@ def calculate_trend(current, previous):
         return round(((current - previous) / previous) * 100, 2)
     except:
         return 0.0
+
+def archive_historical_data(data):
+    """Guarda snapshot do dia anterior pra comparação."""
+    today = datetime.today().strftime("%Y-%m-%d")
+    
+    if "history" not in data:
+        data["history"] = {}
+    
+    # Manter apenas últimos 30 dias
+    if len(data["history"]) > 30:
+        oldest_date = min(data["history"].keys())
+        del data["history"][oldest_date]
+    
+    # Guardar snapshot de hoje
+    data["history"][today] = {
+        "date": today,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "data": {k: v.get("value") for k, v in data.get("macro", {}).items()}
+    }
+    
+    return data
 
 def ultimo_dia_util(delta_days=0):
     """Retorna último dia útil (seg–sex) como string MM-DD-YYYY para PTAX."""
@@ -317,12 +338,27 @@ def update_indicator(data, key, value, source, unit=""):
 
     trend = calculate_trend(value, old_value)
 
+    # Encontrar última data diferente (pra comparativo)
+    previous_date = None
+    previous_value = None
+    
+    if "history" in data and data["history"]:
+        sorted_dates = sorted(data["history"].keys(), reverse=True)
+        for historic_date in sorted_dates:
+            historic_value = data["history"][historic_date].get("data", {}).get(key)
+            if historic_value is not None and historic_value != value:
+                previous_date = historic_date
+                previous_value = historic_value
+                break
+
     data["macro"][key] = {
         "value": value,
         "unit": unit,
         "trend": trend,
         "source": source,
-        "updatedAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        "updatedAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "previousValue": previous_value,
+        "previousDate": previous_date
     }
     return api_ok
 
@@ -397,6 +433,11 @@ def main():
         "successRate": f"{success_count}/{len(api_status)}",
         "apiStatus": api_status
     }
+
+    # --------------------------------------------------
+    # ARQUIVO HISTÓRICO
+    # --------------------------------------------------
+    data = archive_historical_data(data)
 
     # --------------------------------------------------
     # SAVE
