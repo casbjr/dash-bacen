@@ -103,10 +103,15 @@
             transition: all 0.3s ease;
         }
 
-        .refresh-btn:hover {
+        .refresh-btn:hover:not(:disabled) {
             background: var(--accent);
             color: var(--dark);
             box-shadow: 0 8px 24px rgba(212, 165, 116, 0.15);
+        }
+
+        .refresh-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         /* Sections */
@@ -150,6 +155,7 @@
             padding: 1.5rem;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .card:hover {
@@ -168,10 +174,15 @@
             background: linear-gradient(90deg, var(--accent), transparent);
             opacity: 0;
             transition: opacity 0.3s ease;
+            border-radius: 8px 8px 0 0;
         }
 
         .card:hover::before {
             opacity: 1;
+        }
+
+        .card.spread-highlight {
+            border-left: 4px solid var(--accent);
         }
 
         /* Indicator */
@@ -196,6 +207,7 @@
             font-size: 0.9rem;
             color: var(--text-secondary);
             margin-left: 0.2rem;
+            font-weight: 400;
         }
 
         .indicator-meta {
@@ -209,6 +221,7 @@
 
         .trend {
             font-weight: 600;
+            font-size: 0.85rem;
         }
 
         .trend-up {
@@ -219,11 +232,24 @@
             color: var(--danger);
         }
 
+        .trend-neutral {
+            color: var(--text-secondary);
+        }
+
         .source {
             color: var(--text-secondary);
             font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+        }
+
+        .spread-interpretation {
+            margin-top: 0.8rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
         }
 
         /* Comunicados */
@@ -240,6 +266,7 @@
         .comunicado:hover {
             border-color: var(--accent);
             box-shadow: 0 8px 24px rgba(212, 165, 116, 0.08);
+            transform: translateX(4px);
         }
 
         .comunicado-date {
@@ -266,11 +293,12 @@
             font-size: 0.8rem;
             margin-top: 0.7rem;
             border-bottom: 1px solid var(--accent);
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .comunicado-link:hover {
             color: var(--text-primary);
+            border-bottom-color: var(--text-primary);
         }
 
         /* Info Box */
@@ -286,19 +314,55 @@
             color: var(--text-secondary);
             margin-bottom: 0.5rem;
             font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .info-box strong {
+            color: var(--text-primary);
+            font-weight: 600;
         }
 
         .badge {
             display: inline-block;
             background: var(--accent);
             color: var(--dark);
-            padding: 0.3rem 0.7rem;
-            border-radius: 3px;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
             font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-top: 0.5rem;
+            margin-top: 0.7rem;
+            margin-right: 0.5rem;
+        }
+
+        /* API Status Grid */
+        .api-status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.8rem;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .api-status-item {
+            padding: 0.6rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 4px;
+            border-left: 3px solid;
+            transition: all 0.3s ease;
+        }
+
+        .api-status-item.success {
+            border-left-color: var(--success);
+        }
+
+        .api-status-item.error {
+            border-left-color: var(--danger);
+        }
+
+        .api-status-item:hover {
+            background: rgba(255, 255, 255, 0.04);
         }
 
         /* Footer */
@@ -317,9 +381,14 @@
             margin-bottom: 0.3rem;
         }
 
-        .loading {
-            opacity: 0.7;
-            cursor: not-allowed;
+        .error-state {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-size: 0.9rem;
         }
 
         @media (max-width: 768px) {
@@ -335,6 +404,10 @@
             .header-content h1 {
                 font-size: 1.6rem;
             }
+
+            .api-status-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
@@ -349,72 +422,92 @@
             <div class="header-meta">
                 <div class="last-update">Última atualização: <span id="lastUpdate">--:--</span></div>
                 <div class="data-source">🤖 Automática Diária</div>
-                <button class="refresh-btn" onclick="refreshData()">↻ Atualizar</button>
+                <button class="refresh-btn" id="refreshBtn" onclick="refreshData()">↻ Atualizar</button>
             </div>
         </header>
 
         <!-- Info Banner -->
         <div class="info-box">
-            <p><strong>✅ 100% Dados Oficiais:</strong> Todos os indicadores são obtidos diretamente do Banco Central do Brasil e IBGE</p>
-            <p><strong>🔄 Atualização Automática:</strong> Executa todos os dias às 9h via GitHub Actions</p>
+            <p><strong>✅ 100% Dados Oficiais:</strong> Todos os indicadores são obtidos diretamente do Banco Central do Brasil e IBGE via APIs públicas</p>
+            <p><strong>🔄 Atualização Automática:</strong> Script Python executa diariamente — dados salvos em JSON local</p>
+            <p><strong>📡 Fontes Validadas:</strong> SGS (Series Temporais) • PTAX (Cambio) • Expectativas de Mercado • SIDRA (IBGE)</p>
             <span class="badge">Oficial BC/IBGE</span>
+            <span class="badge">APIs Públicas</span>
         </div>
 
-        <!-- SEÇÃO 1: INDICADORES MACROECONÔMICOS -->
+        <!-- SEÇÃO 1: INDICADORES BANCO CENTRAL -->
         <section>
             <h2 class="section-title">Indicadores <strong>Macroeconômicos</strong></h2>
-            <p class="section-subtitle">Banco Central do Brasil</p>
+            <p class="section-subtitle">Banco Central do Brasil — SGS</p>
 
             <div class="grid">
+                <!-- 1. Selic -->
                 <div class="card">
                     <div class="indicator-label">Taxa Selic</div>
-                    <div class="indicator-value"><span id="selic">--</span><span class="unit">%</span></div>
+                    <div class="indicator-value">
+                        <span id="selic">--</span><span class="unit">% a.a.</span>
+                    </div>
                     <div class="indicator-meta">
                         <span class="trend" id="selicTrend"></span>
                         <span class="source" id="selicDate">--</span>
                     </div>
                 </div>
 
+                <!-- 2. IPCA -->
                 <div class="card">
                     <div class="indicator-label">IPCA (12 meses)</div>
-                    <div class="indicator-value"><span id="ipca">--</span><span class="unit">%</span></div>
+                    <div class="indicator-value">
+                        <span id="ipca">--</span><span class="unit">%</span>
+                    </div>
                     <div class="indicator-meta">
                         <span class="trend" id="ipcaTrend"></span>
                         <span class="source" id="ipcaDate">--</span>
                     </div>
                 </div>
 
+                <!-- 3. Dólar -->
                 <div class="card">
                     <div class="indicator-label">Dólar (USD/BRL)</div>
-                    <div class="indicator-value"><span id="dolar">--</span><span class="unit">R$</span></div>
+                    <div class="indicator-value">
+                        <span id="dolar">--</span><span class="unit">R$</span>
+                    </div>
                     <div class="indicator-meta">
                         <span class="trend" id="dolarTrend"></span>
                         <span class="source" id="dolarDate">--</span>
                     </div>
                 </div>
 
+                <!-- 4. Poupança -->
                 <div class="card">
                     <div class="indicator-label">Poupança</div>
-                    <div class="indicator-value"><span id="poupanca">--</span><span class="unit">%</span></div>
+                    <div class="indicator-value">
+                        <span id="poupanca">--</span><span class="unit">% a.m.</span>
+                    </div>
                     <div class="indicator-meta">
                         <span class="trend" id="poupancaTrend"></span>
                         <span class="source" id="poupancaDate">--</span>
                     </div>
                 </div>
 
+                <!-- 5. Focus (Expectativa IPCA) -->
                 <div class="card">
-                    <div class="indicator-label">Expectativa Selic (Focus)</div>
-                    <div class="indicator-value"><span id="focus">--</span><span class="unit">%</span></div>
+                    <div class="indicator-label">Focus IPCA</div>
+                    <div class="indicator-value">
+                        <span id="focus">--</span><span class="unit">%</span>
+                    </div>
                     <div class="indicator-meta">
                         <span class="trend" id="focusTrend"></span>
                         <span class="source" id="focusDate">--</span>
                     </div>
                 </div>
 
-                <div class="card" style="border-left: 4px solid var(--accent);">
-                    <div class="indicator-label">📊 Spread (Focus - Selic)</div>
-                    <div class="indicator-value"><span id="spread">--</span><span class="unit">bps</span></div>
-                    <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.85rem; color: var(--text-secondary);">
+                <!-- 6. Spread (calculado) -->
+                <div class="card spread-highlight">
+                    <div class="indicator-label">📊 Spread de Juros</div>
+                    <div class="indicator-value">
+                        <span id="spread">--</span><span class="unit">bps</span>
+                    </div>
+                    <div class="spread-interpretation">
                         <span id="spreadInterpretation">--</span>
                     </div>
                 </div>
@@ -424,30 +517,39 @@
         <!-- SEÇÃO 2: INDICADORES IBGE -->
         <section>
             <h2 class="section-title">Indicadores <strong>Econômicos</strong></h2>
-            <p class="section-subtitle">Instituto Brasileiro de Geografia e Estatística</p>
+            <p class="section-subtitle">Instituto Brasileiro de Geografia e Estatística — SIDRA</p>
 
             <div class="grid">
+                <!-- 7. Desemprego -->
                 <div class="card">
                     <div class="indicator-label">Taxa de Desemprego</div>
-                    <div class="indicator-value"><span id="desemprego">--</span><span class="unit">%</span></div>
+                    <div class="indicator-value">
+                        <span id="desemprego">--</span><span class="unit">%</span>
+                    </div>
                     <div class="indicator-meta">
                         <span class="trend" id="desempregoTrend"></span>
                         <span class="source" id="desempregoDate">--</span>
                     </div>
                 </div>
 
+                <!-- 8. PIB -->
                 <div class="card">
-                    <div class="indicator-label">PIB (Crescimento)</div>
-                    <div class="indicator-value"><span id="pib">--</span><span class="unit">%</span></div>
+                    <div class="indicator-label">PIB (Variação)</div>
+                    <div class="indicator-value">
+                        <span id="pib">--</span><span class="unit">% acum. 4tri</span>
+                    </div>
                     <div class="indicator-meta">
                         <span class="trend" id="pibTrend"></span>
                         <span class="source" id="pibDate">--</span>
                     </div>
                 </div>
 
+                <!-- 9. Confiança -->
                 <div class="card">
                     <div class="indicator-label">Confiança do Consumidor</div>
-                    <div class="indicator-value"><span id="confianca">--</span><span class="unit"></span></div>
+                    <div class="indicator-value">
+                        <span id="confianca">--</span><span class="unit">pts</span>
+                    </div>
                     <div class="indicator-meta">
                         <span class="trend" id="confiancaTrend"></span>
                         <span class="source" id="confiancaDate">--</span>
@@ -456,62 +558,97 @@
             </div>
         </section>
 
-        <!-- SEÇÃO 4: Status das APIs -->
+        <!-- SEÇÃO 3: Status das APIs -->
         <section>
             <h2 class="section-title">Status das <strong>Integrações</strong></h2>
             <p class="section-subtitle">Verificação de Conectividade com APIs Oficiais</p>
 
             <div class="info-box">
                 <p><strong id="apiSuccessRate">9/9</strong> APIs respondendo normalmente</p>
-                <div id="apiStatusDetails" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.8rem; font-size: 0.85rem;">
+                <div class="api-status-grid" id="apiStatusGrid">
                     <!-- Preenchido via JavaScript -->
                 </div>
             </div>
+
+            <div id="errorContainer"></div>
         </section>
 
-        <!-- SEÇÃO 5: Comunicados BC -->
+        <!-- SEÇÃO 4: Comunicados BC -->
         <section>
             <h2 class="section-title">Comunicados & <strong>Normativas</strong></h2>
             <p class="section-subtitle">Banco Central do Brasil</p>
-            <div id="comunicadosList"></div>
+            <div id="comunicadosList">
+                <p style="color: var(--text-secondary);">Carregando comunicados...</p>
+            </div>
         </section>
 
         <!-- Footer -->
         <footer>
-            <p>© 2024 PortoBank - Dashboard Oficial</p>
-            <p>Dados: Banco Central do Brasil | IBGE | Atualização Automática Diária</p>
+            <p>© 2024 PortoBank - Dashboard Oficial de Indicadores</p>
+            <p>Dados: Banco Central do Brasil | IBGE | Atualização via Script Python + GitHub Actions</p>
+            <p style="margin-top: 1rem; font-size: 0.7rem; color: var(--border);">v2.0 — Python API Consumers | JSON Storage | Real-time Sync</p>
         </footer>
     </div>
 
     <script>
+        // ================================================================
+        // CONFIG
+        // ================================================================
         const CONFIG = {
-            dataUrl: 'data_official.json',
-            cacheDuration: 3600000,
+            dataFile: 'data.json',        // Arquivo gerado pelo script Python
+            cacheDuration: 30 * 60 * 1000, // 30 min cache local
+            refreshInterval: 30 * 60 * 1000 // 30 min refresh automático
         };
 
-        async function loadData() {
-            const cached = localStorage.getItem('dashboardDataOfficial');
-            const cachedTime = localStorage.getItem('dashboardTimeOfficial');
+        const API_NAMES = {
+            'selic': '💵 Selic',
+            'ipca': '📊 IPCA',
+            'dolar': '💱 Dólar',
+            'poupanca': '🏦 Poupança',
+            'focus': '📈 Focus',
+            'desemprego': '👥 Desemprego',
+            'pib': '🎯 PIB',
+            'confianca': '😊 Confiança',
+            'spread': '📉 Spread'
+        };
 
+        // ================================================================
+        // DATA LOADING
+        // ================================================================
+        async function loadData() {
+            const cacheKey = 'dashboardData';
+            const cacheTimeKey = 'dashboardTime';
+            const cached = localStorage.getItem(cacheKey);
+            const cachedTime = localStorage.getItem(cacheTimeKey);
+
+            // Usar cache se válido
             if (cached && cachedTime && (Date.now() - parseInt(cachedTime) < CONFIG.cacheDuration)) {
+                console.log('📦 Usando cache local');
                 return JSON.parse(cached);
             }
 
             try {
-                const response = await fetch(CONFIG.dataUrl, { cache: 'no-cache' });
-                if (response.ok) {
-                    const data = await response.json();
-                    localStorage.setItem('dashboardDataOfficial', JSON.stringify(data));
-                    localStorage.setItem('dashboardTimeOfficial', Date.now().toString());
-                    return data;
-                }
-            } catch (e) {
-                console.warn('Erro ao buscar dados:', e);
-            }
+                const response = await fetch(CONFIG.dataFile, { cache: 'no-cache' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-            return JSON.parse(localStorage.getItem('dashboardDataOfficial') || '{}');
+                const data = await response.json();
+                localStorage.setItem(cacheKey, JSON.stringify(data));
+                localStorage.setItem(cacheTimeKey, Date.now().toString());
+                console.log('✅ Dados carregados da API');
+                return data;
+            } catch (e) {
+                console.warn('⚠️ Erro ao buscar dados:', e);
+                if (cached) {
+                    console.log('📦 Retornando cache (erro ao buscar novo)');
+                    return JSON.parse(cached);
+                }
+                return { macro: {}, metadata: {}, comunicados: [] };
+            }
         }
 
+        // ================================================================
+        // FORMATAÇÃO
+        // ================================================================
         function formatNumber(num, decimals = 2) {
             if (num === null || num === undefined || num === '--') return '--';
             return parseFloat(num).toLocaleString('pt-BR', {
@@ -521,32 +658,48 @@
         }
 
         function formatTrend(value) {
-            if (!value && value !== 0) return '';
+            if (value === null || value === undefined || value === '--' || value === 0) {
+                return '<span class="trend trend-neutral">→ 0,00%</span>';
+            }
             const sign = value >= 0 ? '▲' : '▼';
             const className = value >= 0 ? 'trend-up' : 'trend-down';
             return `<span class="${className}">${sign} ${Math.abs(value).toFixed(2)}%</span>`;
         }
 
+        function formatDate(dateStr) {
+            if (!dateStr) return '--';
+            return new Date(dateStr).toLocaleDateString('pt-BR');
+        }
+
+        // ================================================================
+        // RENDER
+        // ================================================================
         function renderIndicators(data) {
             const macro = data.macro || {};
 
-            // BC indicators
             Object.keys(macro).forEach(key => {
                 const ind = macro[key];
-                if (!ind.value && ind.value !== 0) return;
+                if (ind.value === null || ind.value === undefined) return;
 
-                const el = document.getElementById(key);
-                if (el) {
-                    el.textContent = formatNumber(ind.value);
-                    const trendEl = document.getElementById(key + 'Trend');
-                    if (trendEl) trendEl.innerHTML = formatTrend(ind.trend);
-                    const dateEl = document.getElementById(key + 'Date');
-                    if (dateEl) dateEl.textContent = ind.date;
+                const elValue = document.getElementById(key);
+                if (elValue) {
+                    elValue.textContent = formatNumber(ind.value, 2);
+                }
+
+                const elTrend = document.getElementById(key + 'Trend');
+                if (elTrend) {
+                    elTrend.innerHTML = formatTrend(ind.trend);
+                }
+
+                const elDate = document.getElementById(key + 'Date');
+                if (elDate) {
+                    elDate.textContent = ind.updatedAt ? formatDate(ind.updatedAt) : '--';
                 }
 
                 // Renderizar interpretação do Spread
                 if (key === 'spread' && document.getElementById('spreadInterpretation')) {
-                    document.getElementById('spreadInterpretation').textContent = ind.interpretation || '--';
+                    const interp = ind.interpretation || 'Sem dados';
+                    document.getElementById('spreadInterpretation').textContent = interp;
                 }
             });
         }
@@ -558,28 +711,16 @@
 
             document.getElementById('apiSuccessRate').textContent = successRate;
 
-            const statusDetails = document.getElementById('apiStatusDetails');
-            if (statusDetails) {
-                const apiNames = {
-                    'bc_selic': '💵 Selic',
-                    'bc_ipca': '📊 IPCA',
-                    'bc_cambio': '💱 Dólar',
-                    'bc_poupanca': '🏦 Poupança',
-                    'bc_focus': '📈 Focus',
-                    'ibge_desemprego': '👥 Desemprego',
-                    'ibge_pib': '🎯 PIB',
-                    'ibge_confianca': '😊 Confiança',
-                    'bc_comunicados': '📰 Comunicados'
-                };
+            const grid = document.getElementById('apiStatusGrid');
+            if (grid) {
+                grid.innerHTML = Object.keys(apiStatus).map(key => {
+                    const success = apiStatus[key];
+                    const name = API_NAMES[key] || key;
+                    const statusClass = success ? 'success' : 'error';
+                    const icon = success ? '✅' : '⚠️';
 
-                statusDetails.innerHTML = Object.keys(apiStatus).map(key => {
-                    const status = apiStatus[key];
-                    const name = apiNames[key] || key;
-                    const icon = status === 'success' ? '✅' : '❌';
-                    const color = status === 'success' ? 'var(--success)' : 'var(--danger)';
-                    
                     return `
-                        <div style="padding: 0.5rem; background: rgba(255,255,255,0.02); border-radius: 4px; border-left: 2px solid ${color};">
+                        <div class="api-status-item ${statusClass}">
                             ${icon} ${name}
                         </div>
                     `;
@@ -594,44 +735,68 @@
                 return;
             }
 
-            list.innerHTML = data.comunicados.map(c => `
+            list.innerHTML = data.comunicados.slice(0, 5).map(c => `
                 <div class="comunicado">
-                    <div class="comunicado-date">${c.date}</div>
-                    <div class="comunicado-title">${c.title}</div>
-                    <a href="${c.link}" target="_blank" class="comunicado-link">Acesse no site do BC →</a>
+                    <div class="comunicado-date">${c.data || c.date || '--'}</div>
+                    <div class="comunicado-title">${c.titulo || c.title || ''}</div>
+                    <a href="${c.url || c.link || '#'}" target="_blank" rel="noopener noreferrer" class="comunicado-link">
+                        Acesse no site do BC →
+                    </a>
                 </div>
             `).join('');
         }
 
-        function updateTime() {
+        function updateLastUpdateTime() {
             const now = new Date();
-            const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false });
+            const time = now.toLocaleTimeString('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
             document.getElementById('lastUpdate').textContent = time;
         }
 
+        // ================================================================
+        // MAIN REFRESH
+        // ================================================================
         async function refreshData() {
-            const btn = document.querySelector('.refresh-btn');
-            btn.classList.add('loading');
+            const btn = document.getElementById('refreshBtn');
             btn.disabled = true;
+            btn.textContent = '⟳ Atualizando...';
 
             try {
                 const data = await loadData();
                 renderIndicators(data);
-                renderComunicados(data);
                 renderApiStatus(data);
-                updateTime();
+                renderComunicados(data);
+                updateLastUpdateTime();
             } catch (e) {
-                console.error('Erro:', e);
-                alert('Erro ao atualizar dados');
+                console.error('Erro ao atualizar:', e);
+                showError('Erro ao atualizar dados. Verifique sua conexão.');
             } finally {
-                btn.classList.remove('loading');
                 btn.disabled = false;
+                btn.textContent = '↻ Atualizar';
             }
         }
 
+        function showError(msg) {
+            const container = document.getElementById('errorContainer');
+            if (container) {
+                container.innerHTML = `<div class="error-state">${msg}</div>`;
+            }
+        }
+
+        // ================================================================
+        // INIT
+        // ================================================================
         document.addEventListener('DOMContentLoaded', async () => {
             await refreshData();
-            setInterval(refreshData, 30 * 60 * 1000);
+
+            // Auto-refresh a cada 30 min
+            setInterval(refreshData, CONFIG.refreshInterval);
+
+            // Update time a cada 30s
+            setInterval(updateLastUpdateTime, 30000);
         });
     </script>
 </body>
